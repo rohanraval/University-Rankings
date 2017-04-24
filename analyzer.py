@@ -1,4 +1,6 @@
-# Algorithm for DCF Analysis developed by Rohan Raval and Amar Singh
+# Algorithm for analyzing University Rankings developed by Rohan Raval
+# Dataset obtained from: https://www.kaggle.com/mylesoneill/world-university-rankings
+
 import scraper
 import numpy as np
 import pandas as pd
@@ -7,9 +9,7 @@ from matplotlib import pyplot as plt
 from sklearn import linear_model
 from sklearn.model_selection import cross_val_score
 
-
-#### MAIN METHOD #####
-
+# get the input of the x-parameter that correlates the y-value (rank)
 input_var = raw_input("Enter variable: ")
 # get a dictionary of x:y pairs from dataset
 # x = world-ranks
@@ -46,6 +46,7 @@ ransac_model.fit(x,y)
 
 ### validation of data (based on R-squared value) ### 
 
+# a dictionary of the R-squared values of each model
 r_squared_scores= {
 	'ols_scores' : ols_reg.score(x,y),
 	'ridge_scores' : ridge_reg.score(x,y),
@@ -56,13 +57,19 @@ r_squared_scores= {
 	'sgd_scores' : sgd_reg.score(x,y),
 	'ransac_scores' : ransac_model.score(x,y)
 }
+
 vals = list(r_squared_scores.values())
 keys = list(r_squared_scores.keys())
 
+# get the name of the model with the max R-squared and its value
 max_r_squared = keys[vals.index(max(vals))]
+
 print "Model = %s" % max_r_squared
 print "R-squared = %f" % r_squared_scores[max_r_squared] 
 
+
+# for the model with the max R-squared, get the predicted values
+# on the line of best fit, can now be extended to prediction beyond x-data
 predicted = []
 if max_r_squared == 'ols_scores':
 	predicted = ols_reg.predict(x)
@@ -81,24 +88,25 @@ elif max_r_squared == 'sgd_scores':
 else:
 	predicted = ransac_model.predict(x)
 
-# algorithm
-"""
-reg = linear_model.LinearRegression() # do the linear regression
-reg.fit(x, y) # get the linear fit, using x and y(revenues from df)
-m = reg.coef_[0][0] # slope of fitted line
-b = reg.intercept_[0] # intercept of fitted line
+### data visualization (using matplotlib) ###
 
-predicted = reg.predict(x)
-"""
-#print m, b
-
+# adjust the plot and show labels, title, and R-squared on plot
 fig = plt.figure()
 ax = fig.add_subplot(111)
 fig.subplots_adjust(top=0.85)
-ax.text(20,0, 'R-squared=%f' % r_squared_scores[max_r_squared] )
+ax.set_title('Effect of %s Score on University\'s World Ranking' % input_var.title())
+ax.set_xlabel('%s Score' % input_var.title())
+ax.set_ylabel('World Ranking')
+ax.text(50,5, 'R-squared=%f' % r_squared_scores[max_r_squared] )
 
+# show scatterplot of datapoints
+plt.scatter(x, y, color='orange', alpha=0.7)
 
-plt.scatter(x, y, color='orange', alpha=0.7)  # scatterplot of points
-plt.plot(x, predicted, color='blue', linewidth=2) # plot the linear fit
-plt.gca().invert_yaxis()
+# plot the fitted linear model
+plt.plot(x, predicted, color='blue', linewidth=2)
+
+# invert y-axis because low rank number is actually better (this is more intuitive modeling)
+plt.gca().invert_yaxis() 
+
+# show the plot
 plt.show()

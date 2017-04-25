@@ -51,8 +51,8 @@ def scrapeData_collegeChange(filename, college_name, attribute):
 			university_name = 'institution' if filename == "cwurData.csv" else 'university_name'
 
 			# manage case for comma-separated numbers
-			if ',' in x:
-				x = x.replace(',', '')
+			if ',' in y:
+				y = y.replace(',', '')
 
 			if x != '' and y != '' and "-" not in x and "-" not in y and college_name in row[university_name]:
 				dataset[ int(x) ] = float(y)
@@ -161,9 +161,9 @@ def data_visualization(x,y,predicted,rsquared,attribute,filename, college_name):
 		ax.set_title('Effect of %s %s on University\'s World Ranking' % (attribute.title(), "Rank" if filename == 'cwurData.csv' else "Score")
 		)
 		# invert y-axis because low rank number is actually better (this is more intuitive modeling)
-		plt.gca().invert_yaxis() 
-		if filename == 'cwurData.csv':
-			plt.gca().invert_xaxis() # due to cwur file containing rank instead of scores
+		#plt.gca().invert_yaxis() 
+		#if filename == 'cwurData.csv':
+			#plt.gca().invert_xaxis() # due to cwur file containing rank instead of scores
 
 		ax.set_xlabel('%s %s' % ('Rank' if filename == 'cwurData.csv' else 'Score', attribute.title()) ) 
 	
